@@ -8,13 +8,13 @@ CREATE TABLE identity_assets (
     user_id UUID REFERENCES auth.users(id),
     name TEXT NOT NULL,
     physical_description TEXT, -- e.g., "Woman, mid-20s, short black bob, silver earring"
-    gemini_file_uris JSONB DEFAULT '[]', -- URIs from Gemini Files API
+    gemicinematicstudioni_file_uris JSONB DEFAULT '[]', -- URIs from Gemini Files API
     storage_paths TEXT[] DEFAULT '{}', -- Internal Supabase paths
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- MODULAR PRESETS
-CREATE TABLE cinematic_presets (
+CREATE TABLE cinematic_presets 
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     category preset_category NOT NULL,
     label TEXT NOT NULL,
