@@ -2,7 +2,7 @@
 
 import { GoogleGenAI } from "@google/genai"
 
-export async function generateShot(prompt: string) {
+export async function generateShot(prompt: string, aspectRatio: string = "1:1") {
     if (!process.env.GEMINI_API_KEY) {
         throw new Error("Missing Gemini API Key")
     }
@@ -16,8 +16,11 @@ export async function generateShot(prompt: string) {
             config: {
                 // The documentation recommends this for image-only generation
                 responseModalities: ["Image"],
-                // Optional: image_config for aspect ratio, etc.
-                // Keeping it default (1:1) or whatever the model decides for now unless specified.
+                // Supported aspect ratios: "1:1", "3:4", "4:3", "9:16", "16:9"
+                // @ts-ignore - SDK types might not be up to date
+                imageConfig: {
+                    aspectRatio: aspectRatio,
+                },
             },
         });
 

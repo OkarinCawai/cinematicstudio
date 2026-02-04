@@ -2,6 +2,16 @@ import { Database } from "@/types/supabase";
 
 export type CinematicPreset = Database['public']['Tables']['cinematic_presets']['Row'];
 
+export type AspectRatio = '1:1' | '16:9' | '9:16' | '4:3' | '3:4';
+
+export const ASPECT_RATIOS: { label: string; value: AspectRatio }[] = [
+    { label: 'Square (1:1)', value: '1:1' },
+    { label: 'Cinematic (16:9)', value: '16:9' },
+    { label: 'Portrait (9:16)', value: '9:16' },
+    { label: 'Standard (4:3)', value: '4:3' },
+    { label: 'Vertical (3:4)', value: '3:4' },
+];
+
 export const SEED_PRESETS: CinematicPreset[] = [
     { id: '1', category: 'Camera', label: 'ARRI Alexa 65', prompt_fragment: 'shot on ARRI Alexa 65, large format digital cinema', is_default: true },
     { id: '2', category: 'Camera', label: 'RED V-Raptor', prompt_fragment: 'captured on RED V-Raptor, 8K crisp digital cinema', is_default: false },

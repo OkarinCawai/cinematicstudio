@@ -2,20 +2,16 @@
 
 import { useState, useMemo } from "react"
 import { motion } from "framer-motion"
-import { IdentityUploader } from "@/components/cinematic/IdentityUploader"
+import { Sidebar } from "@/components/layout/Sidebar"
 import { StoryboardGallery } from "@/components/cinematic/StoryboardGallery"
-import { SEED_PRESETS, CinematicPreset } from "@/lib/constants"
+import { SEED_PRESETS, CinematicPreset, AspectRatio } from "@/lib/constants" // Updated import
 import { constructCinematicPrompt } from "@/lib/prompt-formula"
-import { PresetSelector } from "@/components/cinematic/PresetSelector"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Sparkles, Terminal, Loader2, AlertCircle } from "lucide-react"
 import { generateShot } from "./actions"
 
 export default function ShotBuilderPage() {
   const [subjectAction, setSubjectAction] = useState("")
-  const [identityFiles, setIdentityFiles] = useState<File[]>([]) // New state
+  const [identityFiles, setIdentityFiles] = useState<File[]>([])
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>("16:9") // New state
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -81,7 +77,7 @@ export default function ShotBuilderPage() {
     setError(null)
     setResult(null)
     try {
-      const response = await generateShot(finalPrompt)
+      const response = await generateShot(finalPrompt, aspectRatio) // Pass aspect ratio
       if (response.success && response.data) {
         setResult(response.data)
       } else {
@@ -99,126 +95,55 @@ export default function ShotBuilderPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6 p-6 md:p-12 max-w-7xl mx-auto">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Cinematic Vision Engine</h1>
-        <p className="text-muted-foreground text-lg">Build high-fidelity AI storyboards with professional film logic.</p>
-      </header>
+    <div className="flex min-h-screen">
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Sidebar Controls */}
+      <Sidebar
+        subjectAction={subjectAction}
+        setSubjectAction={setSubjectAction}
+        identityFiles={identityFiles}
+        setIdentityFiles={setIdentityFiles}
+        selectedIds={selectedIds}
+        onTogglePreset={handleTogglePreset}
+        onGenerate={handleGenerate}
+        loading={loading}
+        presets={SEED_PRESETS}
+      />
 
-        {/* Left Column: Controls */}
-        <div className="lg:col-span-2 space-y-8">
-
-          {/* Identity Uploader Section (New) */}
-          <Card className="border-primary/20 bg-card/50">
-            <CardHeader>
-              <CardTitle>Identity Locking</CardTitle>
-              <CardDescription>Upload character references (max 14) to maintain consistency.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <IdentityUploader onAssetsChange={setIdentityFiles} />
-            </CardContent>
-          </Card>
-
-          {/* Subject Input */}
-          <Card className="border-primary/20 bg-card/50">
-            <CardHeader>
-              <CardTitle>Subject & Action</CardTitle>
-              <CardDescription>Describe what is happening in the shot.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Input
-                placeholder="e.g., Cyberpunk detective walking through rain..."
-                className="text-lg py-6"
-                value={subjectAction}
-                onChange={(e) => setSubjectAction(e.target.value)}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Presets Grid */}
-          <div className="space-y-6">
-            {categories.map((category) => (
-              <PresetSelector
-                key={category}
-                category={category}
-                presets={SEED_PRESETS}
-                selectedIds={selectedIds}
-                onToggle={handleTogglePreset}
-              />
-            ))}
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-h-screen bg-background">
+        <header className="h-[64px] border-b border-border flex items-center justify-between px-6 bg-card/30 backdrop-blur-md sticky top-0 z-10">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-bold text-black text-xl">C</div>
+            <h1 className="text-xl font-bold tracking-tight">Cinematic Vision</h1>
           </div>
-        </div>
 
-        {/* Right Column: Preview & Action */}
-        <div className="space-y-6">
-          <Card className="sticky top-6 border-accent/20 overflow-hidden">
-            <div className="bg-accent/10 p-4 border-b border-accent/10 flex items-center gap-2">
-              <Terminal className="w-4 h-4 text-accent" />
-              <span className="text-xs font-mono text-accent uppercase tracking-widest">Prompt Formula</span>
-            </div>
-            <CardContent className="p-0">
-              <div className="bg-black/50 p-6 font-mono text-sm text-muted-foreground leading-relaxed h-[300px] overflow-y-auto">
-                <span className="text-foreground">{subjectAction || "[Subject Action]"}</span>
-                {selectedPresets.length > 0 && <span className="text-primary/70">{" + " + selectedPresets.map(p => p.prompt_fragment).join(" + ")}</span>}
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-muted-foreground">Workspace: <span className="text-foreground font-medium">Concept Art</span></div>
+          </div>
+        </header>
 
-                <div className="mt-6 pt-6 border-t border-border">
-                  <p className="text-xs text-muted-foreground mb-2">FINAL COMPILED PROMPT:</p>
-                  <p className="text-foreground">{finalPrompt}</p>
+        <main className="flex-1 p-6 lg:p-10 overflow-y-auto">
+          {/* Generation Result (Temporary Highlighting) */}
+          {result && (
+            <div className="mb-12">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-4">Latest Generation</h2>
+              <div className="relative aspect-video max-w-4xl bg-black border border-primary/30 rounded-lg overflow-hidden shadow-[0_0_50px_-10px_theme(colors.primary.DEFAULT / 0.2)]">
+                {result.startsWith("data:image") ? (
+                  <img src={result} alt="Latest" className="w-full h-full object-contain" />
+                ) : (
+                  <div className="p-10 text-mono text-green-500">{result}</div>
+                )}
+                <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-xs font-mono border border-white/10 text-white">
+                  Generated just now
                 </div>
               </div>
-            </CardContent>
-            <div className="p-6 border-t border-border bg-card">
-              <Button
-                size="lg"
-                className="w-full bg-primary text-primary-foreground font-bold text-md shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all disabled:opacity-50"
-                onClick={handleGenerate}
-                disabled={loading || !subjectAction}
-              >
-                {loading ? (
-                  <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Generating...</>
-                ) : (
-                  <><Sparkles className="w-5 h-5 mr-2" /> Generate Shot</>
-                )}
-              </Button>
             </div>
-            {error && (
-              <div className="bg-destructive/10 text-destructive text-sm p-4 rounded-b-lg border-t border-destructive/20 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4" />
-                {error}
-              </div>
-            )}
-            {result && (
-              <div className="p-4 bg-green-500/10 text-green-500 text-sm border-t border-green-500/20">
-                <p className="font-bold mb-1">Result:</p>
-                {result.startsWith("data:image") ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={result} alt="Generated Shot" className="w-full rounded-md shadow-lg mt-2" />
-                ) : (
-                  <p className="font-mono text-xs break-all">{result}</p>
-                )}
-              </div>
-            )}
-          </Card>
+          )}
 
-          {/* Quick Stats / Info */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-secondary/30 p-4 rounded-lg border border-border">
-              <div className="text-xs uppercase text-muted-foreground">Model</div>
-              <div className="font-mono text-sm font-bold text-foreground">Gemini 2.5 Flash</div>
-            </div>
-            <div className="bg-secondary/30 p-4 rounded-lg border border-border">
-              <div className="text-xs uppercase text-muted-foreground">Est. Cost</div>
-              <div className="font-mono text-sm font-bold text-foreground">~0.04 / img</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Gallery Section */}
-      <div className="mt-12 md:mt-24 border-t border-border pt-12">
-        <StoryboardGallery />
+          {/* Gallery */}
+          <StoryboardGallery />
+        </main>
       </div>
 
     </div>
