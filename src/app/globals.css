@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  /* Dark Cinema Theme Base */
+  --background: #0a0a0a;
+  --foreground: #ededed;
+
+  /* Card / Surfaces */
+  --card: #171717; /* Neutral-900 */
+  --card-foreground: #ededed;
+
+  /* Primary Action (Cinematic Amber/Gold) */
+  --primary: #f59e0b; /* Amber-500 */
+  --primary-foreground: #171717;
+
+  /* Secondary / Muted */
+  --secondary: #262626; /* Neutral-800 */
+  --secondary-foreground: #d4d4d4;
+  
+  --muted: #404040; /* Neutral-700 */
+  --muted-foreground: #a3a3a3;
+
+  /* Accent (Teal for technical elements) */
+  --accent: #2dd4bf; /* Teal-400 */
+  --accent-foreground: #171717;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ededed;
+
+  --border: #262626;
+  --input: #262626;
+  --ring: #f59e0b;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
